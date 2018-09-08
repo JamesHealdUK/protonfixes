@@ -56,8 +56,6 @@ function addSteamLibrary()
         [Yy]* )
           addSteamLibrariesFromLibraryFoldersFile "$PFXS_SETUP_STEAMAPPS/libraryfolders.vdf"
         ;;
-        [Nn]* )
-        ;;
       esac
     fi
     saveSteamLibrariesToFile
@@ -85,10 +83,18 @@ function findGameInLibraries()
   for _prefix in "${PFXS_STEAMAPPS[@]}"
   do
     if [ -z `find $_prefix -maxdepth 1 -name $1 -type d` ]; then
-      printf "${BOLDWHITE}Game found, running fix!${RESET}\n"
       _PFXS_GAME_FOLDER_NAME=$(grep 'installdir' '/home/james/.steam/steam/steamapps/appmanifest_'$1'.acf' | sed -r 's/(([^"]*"){3})//; s/"//')
       _PFXS_GAME_NAME=$(grep 'name' '/home/james/.steam/steam/steamapps/appmanifest_'$1'.acf' | sed -r 's/(([^"]*"){3})//; s/"//')
-      sh ./fixes/$1.sh $_prefix/compatdata/$1 "$_prefix/common/$_PFXS_GAME_FOLDER_NAME" "$_PFXS_GAME_NAME"
+      printf "$_PFXS_GAME_NAME ${BOLDWHITE} found!\n"
+      if [[ ! -f $_prefix/common/$_PFXS_GAME_FOLDER_NAME/protonfixes.lock && -f $_prefix/compatdata/$1/protonfixes.lock ]]; then
+        sh ./fixes/$1.sh $_prefix/compatdata/$1 "$_prefix/common/$_PFXS_GAME_FOLDER_NAME" "$_PFXS_GAME_NAME"
+        touch $_prefix/common/$_PFXS_GAME_FOLDER_NAME/protonfixes.lock
+        touch $_prefix/compatdata/$1/protonfixes.lock
+      else
+        printf "${BOLDWHITE}Fix for:${RESET} $_PFXS_GAME_NAME ${BOLDWHITE}could not be run because it has already been applied${RESET}\n"
+      fi
+
+
       break;
     fi
   done
