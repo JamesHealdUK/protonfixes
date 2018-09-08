@@ -88,11 +88,9 @@ function findGameInLibraries()
       printf "$_PFXS_GAME_NAME ${BOLDWHITE} found!\n"
       if [[ ! -f $_prefix/common/$_PFXS_GAME_FOLDER_NAME/protonfixes.lock && ! -f $_prefix/compatdata/$1/protonfixes.lock ]]; then
         sh ./fixes/$1.sh $_prefix/compatdata/$1 "$_prefix/common/$_PFXS_GAME_FOLDER_NAME" "$_PFXS_GAME_NAME"
-        if [ ! $2 = "--dev" ]; then
+        if [[ ! $2 = "--dev" ]]; then
           touch "$_prefix/common/$_PFXS_GAME_FOLDER_NAME/protonfixes.lock"
           touch "$_prefix/compatdata/$1/protonfixes.lock"
-        else
-          echo "Development mode enabled, fix applied anyway."
         fi
       else
         printf "${BOLDWHITE}Fix for:${RESET} $_PFXS_GAME_NAME ${BOLDWHITE}could not be run because it has already been applied${RESET}\n"
